@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="telegramWebsocket.js"></script>
+    <title>Telegram to Websocket</title>
+    <script>
+        const SERVER = "127.0.0.1:8080";
+
+        // 有新訊息時 call 這個
+        function newMessage(message, messageid, author, timestamp){
+            $(document.body).append("<p>" + author + ": " + message +" (" + timestamp + ")</p>");
+        }
+
+        function newPhoto(message, messageid, photoURL, author, timestamp){
+            $(document.body).append("<p>" + author + ": <img src='http://" + SERVER + photoURL + "' /> <br />" + ((typeof message != "undefined") ? message : "") + " (" + timestamp + ")</p>");
+        }
+
+        // 原本的訊息被修改時 call 這個
+        function updateMessage(data){
+        }
+
+        let ws = new TelegramWebSocket({
+            "url": "ws://" + SERVER,
+            "channel": "-167065182", // LTAY 
+            "newText": function(data){ // 新訊息
+                newMessage(data.text, data.message_id, data.from.first_name + " " + data.from.last_name, data.date);
+            },
+            "newPhoto": function(data){ // 新照片
+                newPhoto(data.text, data.message_id, data.photoURL, data.from.first_name + " " + data.from.last_name, data.date);
+            },
+            "newSticker": function(data){ // 新貼圖
+                newMessage(data.sticker.emoji, data.message_id, data.from.first_name + " " + data.from.last_name, data.date);
+            },
+            "newVideo": function(data){ // 新影片
+                newMessage("[video]", data.message_id, data.from.first_name + " " + data.from.last_name, data.date);
+            },
+            "newDocument": function(data){ // 新檔案
+                newMessage("[document]" + data.file_name, data.message_id, data.from.first_name + " " + data.from.last_name, data.date);
+            },
+            "updateText": function(data){ // 更新訊息
+                console.log("updateText", data);
+                updateMessage(data);
+            }
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
