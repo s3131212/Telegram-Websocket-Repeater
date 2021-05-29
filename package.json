@@ -11,6 +11,6 @@
   "dependencies": {
     "find-remove": "^1.2.2",
     "node-telegram-bot-api": "^0.30.0",
-    "ws": "^6.2.0"
+    "ws": "^7.4.6"
   }
 }
